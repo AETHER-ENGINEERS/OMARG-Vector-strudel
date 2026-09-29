@@ -4,9 +4,7 @@ const IDB_NAME = "strudel-xdc-samples";
 const IDB_STORE = "files";
 
 const bank = {
-  /** @type {Map<string, {name:string, files:{name:string, blob:Blob}[]}>} */
   sounds: new Map(),
-  /** decoded buffers, key = sound:index */
   decoded: new Map(),
 };
 
@@ -66,10 +64,25 @@ async function idbClear() {
   });
 }
 
+function ensureSound(sound, kind) {
+  if (!bank.sounds.has(sound)) {
+    bank.sounds.set(sound, { name: sound, kind: kind || "hits", files: [], notes: {} });
+  }
+  const entry = bank.sounds.get(sound);
+  if (kind) entry.kind = kind;
+  return entry;
+}
+
 function addToBank(path, blob) {
   const sound = soundNameFromPath(path);
-  if (!bank.sounds.has(sound)) bank.sounds.set(sound, { name: sound, files: [] });
-  bank.sounds.get(sound).files.push({ name: path, blob });
+  const entry = ensureSound(sound, "hits");
+  entry.files.push({ name: path, blob });
+}
+
+function addPitched(sound, note, path, blob) {
+  const entry = ensureSound(sound, "notes");
+  entry.notes[note] = { name: path, blob };
+  entry.files.push({ name: path, blob, note });
 }
 
 function readU32(v, o) {
@@ -89,7 +102,6 @@ async function inflateRaw(bytes) {
   return new Uint8Array(buf);
 }
 
-/** Minimal ZIP reader: stored + deflate, local headers only. */
 async function unzip(arrayBuffer, onFile) {
   const u8 = new Uint8Array(arrayBuffer);
   let o = 0;
@@ -147,8 +159,22 @@ async function restoreFromIdb() {
   return rows.length;
 }
 
+function stockManifest() {
+  return window.STOCK_PACK && typeof window.STOCK_PACK === "object" ? window.STOCK_PACK : {};
+}
+
 function listSounds() {
-  return [...bank.sounds.keys()].sort();
+  const names = new Set(bank.sounds.keys());
+  for (const n of Object.keys(stockManifest())) names.add(n);
+  return [...names].sort();
+}
+
+function soundCount(name) {
+  if (bank.sounds.has(name)) return bank.sounds.get(name).files.length;
+  const spec = stockManifest()[name];
+  if (!spec) return 0;
+  if (spec.kind === "notes") return Object.keys(spec.files || {}).length;
+  return (spec.files || []).length;
 }
 
 function snippet() {
@@ -158,7 +184,11 @@ function snippet() {
     "samples({\n" +
     names
       .map((n) => {
-        const count = bank.sounds.get(n).files.length;
+        const count = soundCount(n);
+        const spec = stockManifest()[n];
+        if ((spec && spec.kind === "notes") || (bank.sounds.get(n) && bank.sounds.get(n).kind === "notes")) {
+          return `  ${JSON.stringify(n)}: /* pitched x${count} */`;
+        }
         return `  ${JSON.stringify(n)}: [${Array.from({ length: count }, (_, i) => i).join(", ")}]`;
       })
       .join(",\n") +
@@ -187,26 +217,40 @@ async function playSample(ctx, sound, when, index) {
   return true;
 }
 
+async function asFile(f) {
+  if (!f) return null;
+  if (typeof File !== "undefined" && f instanceof File) return f;
+  if (typeof Blob !== "undefined" && f instanceof Blob) {
+    return new File([f], f.name || "sample", { type: f.type || "application/octet-stream" });
+  }
+  if (f.blob) {
+    const blob = f.blob;
+    return new File([blob], f.name || "sample", { type: blob.type || f.type || "application/octet-stream" });
+  }
+  if (f.base64) {
+    const blob = b64ToBlob(f.base64, f.type || f.mime);
+    return new File([blob], f.name || "sample", { type: blob.type });
+  }
+  return null;
+}
+
+async function importFilesList(files) {
+  let n = 0;
+  for (const raw of files || []) {
+    const f = await asFile(raw);
+    if (f) n += await ingestFile(f);
+  }
+  return n;
+}
+
 async function importViaXdc() {
   const xdc = window.webxdc;
   if (!xdc?.importFiles) throw new Error("importFiles not on this host");
   const files = await xdc.importFiles({
     multiple: true,
-    mimeTypes: [
-      "audio/wav",
-      "audio/wave",
-      "audio/x-wav",
-      "audio/mpeg",
-      "audio/ogg",
-      "audio/flac",
-      "audio/mp4",
-      "application/zip",
-    ],
     extensions: [".wav", ".mp3", ".ogg", ".oga", ".opus", ".flac", ".m4a", ".zip"],
   });
-  let n = 0;
-  for (const f of files || []) n += await ingestFile(f);
-  return n;
+  return importFilesList(files);
 }
 
 async function importViaInput(multiple) {
@@ -235,7 +279,6 @@ function b64ToBlob(b64, mime) {
   return new Blob([bytes], { type: mime || "audio/ogg" });
 }
 
-/** Load the CC0 Sonic Pi subset shipped in starter-pack-*.js. Not written to IDB. */
 function loadStarter() {
   const pack = window.STARTER_PACK;
   if (!Array.isArray(pack) || !pack.length) return 0;
@@ -265,10 +308,75 @@ function urlFor(path, blob) {
   return url;
 }
 
-function strudelMap() {
+function stockUrlMap() {
   const map = {};
+  const pack = stockManifest();
+  for (const [name, spec] of Object.entries(pack)) {
+    const base = spec.base || "";
+    if (spec.kind === "notes") {
+      const notes = {};
+      for (const [note, file] of Object.entries(spec.files || {})) notes[note] = base + file;
+      map[name] = notes;
+    } else {
+      map[name] = (spec.files || []).map((file) => base + file);
+    }
+  }
+  return map;
+}
+
+async function fetchBlob(path) {
+  try {
+    const res = await fetch(path);
+    if (!res.ok) return null;
+    return await res.blob();
+  } catch (_) {
+    return null;
+  }
+}
+
+async function loadStock() {
+  const pack = stockManifest();
+  const names = Object.keys(pack);
+  if (!names.length) return { sounds: 0, files: 0, fetched: 0 };
+  let files = 0;
+  let fetched = 0;
+  for (const [name, spec] of Object.entries(pack)) {
+    const base = spec.base || "";
+    if (spec.kind === "notes") {
+      for (const [note, file] of Object.entries(spec.files || {})) {
+        files += 1;
+        const path = base + file;
+        const blob = await fetchBlob(path);
+        if (blob) {
+          addPitched(name, note, path, blob);
+          fetched += 1;
+        }
+      }
+    } else {
+      for (const file of spec.files || []) {
+        files += 1;
+        const path = base + file;
+        const blob = await fetchBlob(path);
+        if (blob) {
+          addToBank(path, blob);
+          fetched += 1;
+        }
+      }
+    }
+  }
+  return { sounds: names.length, files, fetched };
+}
+
+function strudelMap() {
+  const map = stockUrlMap();
   for (const [name, entry] of bank.sounds) {
-    map[name] = entry.files.map((f) => urlFor(f.name, f.blob));
+    if (entry.kind === "notes" && entry.notes && Object.keys(entry.notes).length) {
+      const notes = {};
+      for (const [note, f] of Object.entries(entry.notes)) notes[note] = urlFor(f.name, f.blob);
+      map[name] = notes;
+    } else {
+      map[name] = entry.files.map((f) => urlFor(f.name, f.blob));
+    }
   }
   return map;
 }
@@ -277,8 +385,13 @@ window.StrudelSamples = {
   bank,
   restoreFromIdb,
   loadStarter,
+  loadStock,
+  stockUrlMap,
+  stockManifest,
+  soundCount,
   importViaXdc,
   importViaInput,
+  importFilesList,
   listSounds,
   snippet,
   playSample,
@@ -290,5 +403,6 @@ window.StrudelSamples = {
     revokeUrls();
     await idbClear();
     loadStarter();
+    await loadStock();
   },
 };
