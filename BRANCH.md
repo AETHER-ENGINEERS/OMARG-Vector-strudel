@@ -1,7 +1,5 @@
-# v0.1.8
+# v0.1.8 — accidental freeze
 
-Frozen jam build. `main` stays the Phase 0 scaffold.
+Do not use this branch as the good jam build.
 
-0.1.9 (native supersaw / slider cache) and 0.1.10 (pre-vendor worklet patch) were scrapped after live Vector tests.
-
-Packed drop-in is not stored in git (binary + samples). Build with `scripts/pack-xdc.sh`.
+Slider issues started in 0.1.8. The last good build is **`v0.1.7`**.
