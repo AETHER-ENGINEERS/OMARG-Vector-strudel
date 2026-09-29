@@ -6,7 +6,7 @@ AETHER-ENGINEERS / OMARG port. Drop the built `.xdc` into a Vector chat. Peers t
 
 **Status:** Phase 1 drop-in. Vendored `@strudel/web` 1.3.0 + CC0 starter drum kit. Ready for a live YouTube test in Vector.
 
-**License:** AGPL-3.0-or-later for *code*. Bundled starter *audio* is CC0 1.0 from Sonic Pi — see the addendum at the bottom of `LICENSE` and the full map in `packs/starter/CREDITS.md`. The AGPL text was not replaced. The CC0 hits do not become AGPL.
+**License:** https://github.com/AETHER-ENGINEERS/AETHER-ENGINEERS/blob/main/LICENSE
 
 Repo: https://github.com/AETHER-ENGINEERS/OMARG-Vector-strudel
 
