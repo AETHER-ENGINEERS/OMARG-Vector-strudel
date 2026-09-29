@@ -4,7 +4,9 @@ const IDB_NAME = "strudel-xdc-samples";
 const IDB_STORE = "files";
 
 const bank = {
+  /** @type {Map<string, {name:string, files:{name:string, blob:Blob}[]}>} */
   sounds: new Map(),
+  /** decoded buffers, key = sound:index */
   decoded: new Map(),
 };
 
@@ -87,6 +89,7 @@ async function inflateRaw(bytes) {
   return new Uint8Array(buf);
 }
 
+/** Minimal ZIP reader: stored + deflate, local headers only. */
 async function unzip(arrayBuffer, onFile) {
   const u8 = new Uint8Array(arrayBuffer);
   let o = 0;
@@ -137,8 +140,7 @@ async function ingestFile(file, prefix) {
 }
 
 async function restoreFromIdb() {
-  bank.sounds.clear();
-  bank.decoded.clear();
+  // Do not clear the bank — loadStarter() runs first and must survive this.
   const rows = await idbGetAll().catch(() => []);
   for (const row of rows) {
     if (typeof row.key === "string" && row.blob) addToBank(row.key, row.blob);
@@ -171,16 +173,16 @@ async function decodeSound(ctx, sound, index) {
   const key = sound + ":" + index;
   if (bank.decoded.has(key)) return bank.decoded.get(key);
   const buf = await entry.files[index].blob.arrayBuffer();
-  const audioBuf = await ctx.decodeAudioData(buf.slice(0));
-  bank.decoded.set(key, audioBuf);
-  return audioBuf;
+  const audio = await ctx.decodeAudioData(buf.slice(0));
+  bank.decoded.set(key, audio);
+  return audio;
 }
 
 async function playSample(ctx, sound, when, index) {
-  const audioBuf = await decodeSound(ctx, sound, index || 0);
-  if (!audioBuf) return false;
+  const audio = await decodeSound(ctx, sound, index || 0);
+  if (!audio) return false;
   const src = ctx.createBufferSource();
-  src.buffer = audioBuf;
+  src.buffer = audio;
   src.connect(ctx.destination);
   src.start(when ?? ctx.currentTime);
   return true;
@@ -227,9 +229,31 @@ async function importViaInput(multiple) {
   });
 }
 
+function b64ToBlob(b64, mime) {
+  const bin = atob(b64);
+  const bytes = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+  return new Blob([bytes], { type: mime || "audio/ogg" });
+}
+
+/** Load the CC0 Sonic Pi subset shipped in starter-pack-*.js. Not written to IDB. */
+function loadStarter() {
+  const pack = window.STARTER_PACK;
+  if (!Array.isArray(pack) || !pack.length) return 0;
+  let n = 0;
+  for (const item of pack) {
+    if (!item || !item.path || !item.data) continue;
+    const blob = b64ToBlob(item.data, item.mime);
+    addToBank("starter/" + item.path, blob);
+    n++;
+  }
+  return n;
+}
+
 window.StrudelSamples = {
   bank,
   restoreFromIdb,
+  loadStarter,
   importViaXdc,
   importViaInput,
   listSounds,
@@ -240,5 +264,6 @@ window.StrudelSamples = {
     bank.sounds.clear();
     bank.decoded.clear();
     await idbClear();
+    loadStarter();
   },
 };
