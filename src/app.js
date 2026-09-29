@@ -1,4 +1,4 @@
-/* Strudel XDC Phase 0 — transport + local audio probe. SuperDough lands in Phase 0.5. */
+/* Strudel XDC Phase 0 — transport + local audio probe. */
 (() => {
   const $ = (id) => document.getElementById(id);
   const log = (line) => {
@@ -101,8 +101,7 @@
     hit("hh", t + beat * 2, "hh");
     beep("saw", t + beat * 2);
     hit("hh", t + beat * 3, "hh");
-    const bar = beat * 4 * 1000;
-    timer = setTimeout(stepLoop, bar);
+    timer = setTimeout(stepLoop, beat * 4 * 1000);
   }
 
   async function play() {
@@ -112,7 +111,7 @@
     playing = true;
     $("play").disabled = true;
     $("stop").disabled = false;
-    $("status").textContent = (xdc ? "vector" : "solo") + " · playing (stub kit)";
+    $("status").textContent = (xdc ? "vector" : "solo") + " · playing";
     log("audio armed @ " + ctx.sampleRate + " Hz");
     stepLoop();
     publishDoc();
@@ -144,9 +143,7 @@
 
   function applyDoc(doc) {
     if (!doc || doc.type !== "doc") return;
-    if (typeof doc.code === "string" && doc.code !== $("code").value) {
-      $("code").value = doc.code;
-    }
+    if (typeof doc.code === "string" && doc.code !== $("code").value) $("code").value = doc.code;
     if (typeof doc.cps === "number") $("cpm").value = String(Math.round(doc.cps * 60));
     log("hydrated evalSeq " + doc.evalSeq + " from " + (doc.author || "?"));
   }
@@ -155,14 +152,7 @@
     if (!xdc?.sendUpdate) return;
     const p = payload();
     try {
-      xdc.sendUpdate(
-        {
-          payload: p,
-          document: "strudel",
-          summary: playing ? "live" : "paused",
-        },
-        ""
-      );
+      xdc.sendUpdate({ payload: p, document: "strudel", summary: playing ? "live" : "paused" }, "");
       log("sendUpdate evalSeq " + p.evalSeq);
     } catch (err) {
       log("sendUpdate failed: " + err);
@@ -174,16 +164,7 @@
     if (xdc?.joinRealtimeChannel) {
       try {
         const ch = xdc.joinRealtimeChannel();
-        const msg = new TextEncoder().encode(
-          JSON.stringify({
-            v: 1,
-            type: "eval",
-            evalSeq,
-            code: $("code").value,
-            cps: cpm() / 60,
-            author: selfAddr,
-          })
-        );
+        const msg = new TextEncoder().encode(JSON.stringify({ v: 1, type: "eval", evalSeq, code: $("code").value, cps: cpm() / 60, author: selfAddr }));
         ch.send(msg);
         log("realtime eval sent (" + msg.byteLength + " B)");
       } catch (err) {
@@ -198,12 +179,12 @@
     const list = $("banklist");
     list.innerHTML = "";
     if (!names.length) {
-      meta.textContent = "empty — download a kit from GitHub, then Import pack";
+      meta.textContent = "empty — import a pack";
       return;
     }
     let files = 0;
     for (const n of names) files += Samples.bank.sounds.get(n).files.length;
-    meta.textContent = names.length + " sounds / " + files + " files (this device only)";
+    meta.textContent = names.length + " sounds / " + files + " files";
     for (const n of names) {
       const li = document.createElement("li");
       const count = Samples.bank.sounds.get(n).files.length;
@@ -214,9 +195,7 @@
 
   async function importPack() {
     try {
-      const n = xdc?.importFiles
-        ? await Samples.importViaXdc()
-        : await Samples.importViaInput(true);
+      const n = xdc?.importFiles ? await Samples.importViaXdc() : await Samples.importViaInput(true);
       log("imported " + n + " audio files");
       renderBank();
     } catch (err) {
@@ -226,7 +205,7 @@
 
   async function clearBank() {
     await Samples.clear();
-    log("local bank cleared");
+    log("imported bank cleared; starter kit kept");
     renderBank();
   }
 
@@ -236,9 +215,12 @@
   $("import").addEventListener("click", importPack);
   $("clearbank").addEventListener("click", clearBank);
 
+  const bundled = Samples.loadStarter();
+  if (bundled) log("starter kit " + bundled + " files (Sonic Pi CC0)");
+
   Samples.restoreFromIdb()
     .then((n) => {
-      if (n) log("restored " + n + " files from IndexedDB");
+      if (n) log("restored " + n + " imported files from IndexedDB");
       renderBank();
     })
     .catch((err) => log("idb: " + err));
