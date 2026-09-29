@@ -16,7 +16,62 @@
       <p id="status">solo · tap play to arm audio</p>
     </div>
     <div class="who" id="who"></div>
+    <button id="helpbtn" class="ghost helpbtn" type="button">Help</button>
   </header>
+
+  <aside id="help" class="help" hidden>
+    <div class="help-tabs" role="tablist">
+      <button type="button" data-tab="jam" class="on">Jam</button>
+      <button type="button" data-tab="words">Glossary</button>
+      <button type="button" data-tab="sounds">Sounds</button>
+      <button type="button" data-tab="examples">Examples</button>
+    </div>
+
+    <section data-pane="jam">
+      <h3>How a room works</h3>
+      <ol>
+        <li>Each person taps <strong>Play</strong> once. That arms <em>their</em> speaker. Audio never leaves the device.</li>
+        <li>Code travels. Sound does not. Everyone renders the same pattern locally.</li>
+        <li><strong>Eval to room</strong> (or Ctrl/Cmd+Enter) sends the editor to everyone who already tapped Play.</li>
+        <li><strong>live</strong> hot-swaps as you type (220ms). Friends hear it after Eval, or live if the pulse lands.</li>
+        <li><strong>Stop</strong> (Ctrl/Cmd+.) hushes this device and tells the room you paused.</li>
+      </ol>
+      <p>Stay in one scale for family jams. Default is <strong>A minor pentatonic</strong>: a c e g. Swap those letters and it still sings.</p>
+      <p class="muted">Vector has no AudioWorklet. Prefer <code>sawtooth</code>, <code>piano</code>, and drums. <code>supersaw</code> and <code>room()</code> often throw here.</p>
+    </section>
+
+    <section data-pane="words" hidden>
+      <h3>Mini-notation</h3>
+      <dl>
+        <dt><code>bd*4</code></dt><dd>Play bd four times in one cycle.</dd>
+        <dt><code>~</code></dt><dd>Rest. Silence that slot.</dd>
+        <dt><code>[a1 c2]</code></dt><dd>Subdivide. Two notes in the time of one.</dd>
+        <dt><code><a3 c4 e4></code></dt><dd>One per cycle, rotating.</dd>
+        <dt><code>"hh*8"/2</code></dt><dd>Twice as slow.</dd>
+        <dt><code>$:</code></dt><dd>A layer. Stack as many as you want.</dd>
+        <dt><code>s("bd")</code></dt><dd>Which sound. Drums, piano, sawtooth…</dd>
+        <dt><code>note("a3")</code></dt><dd>Pitch. Letter + octave.</dd>
+        <dt><code>slider(0.5, 0, 1)</code></dt><dd>Number you can drag under the editor.</dd>
+        <dt><code>setcpm(140/4)</code></dt><dd>140 BPM if a cycle is 4 beats.</dd>
+        <dt><code>.gain(0.4)</code></dt><dd>Volume 0–1. Keep leads quiet.</dd>
+        <dt><code>.lpf(800)</code></dt><dd>Low-pass filter. Smaller = darker.</dd>
+      </dl>
+    </section>
+
+    <section data-pane="sounds" hidden>
+      <h3>Shipped with this xdc</h3>
+      <p><strong>Drums (Sonic Pi CC0)</strong> — <code>bd</code> <code>sd</code> <code>hh</code> <code>oh</code> <code>cp</code> <code>rim</code> <code>ht</code> <code>mt</code> <code>lt</code> <code>cr</code> <code>cb</code></p>
+      <p><strong>Synths (always on)</strong> — <code>sine</code> <code>triangle</code> <code>square</code> <code>sawtooth</code></p>
+      <p><strong>Stock</strong> — <code>piano</code> <code>kalimba</code> <code>marimba</code> <code>vibraphone</code> <code>glockenspiel</code> <code>ocarina</code> <code>harmonica</code> <code>wineglass</code> <code>gong</code> <code>cabasa</code> <code>clap</code> <code>clave</code> <code>triangle</code> <code>woodblock</code></p>
+      <p class="muted">Import pack adds your own files to this device only. They are not sent in the chat.</p>
+    </section>
+
+    <section data-pane="examples" hidden>
+      <h3>Load into the editor</h3>
+      <p class="muted">Replaces what’s there. Tap Play after. Eval to room to share.</p>
+      <div id="exlist" class="exlist"></div>
+    </section>
+  </aside>
 
   <div class="editor-wrap">
     <pre id="codehi" class="code-hi" aria-hidden="true"></pre>
@@ -38,14 +93,12 @@ $: note("[a1 a1] [a1 c2] [a1 a1] [g1 a1]")
   .gain(0.48)
 
 $: note("<a3 c4 e4 g4 a4 g4 e4 c4>/2")
-  .s("supersaw")
+  .s("sawtooth")
   .lpf(slider(1600, 400, 4800))
-  .room(0.35)
   .gain(0.26)
 
 $: note("<a3 ~ e4 c4 ~ g4 e4 a4>")
   .s("piano")
-  .room(0.5)
   .gain(slider(0.4, 0, 1))</textarea>
   </div>
 
@@ -75,6 +128,7 @@ $: note("<a3 ~ e4 c4 ~ g4 e4 a4>")
   <script src="starter-pack-3.js"></script>
   <script src="starter-pack-4.js"></script>
   <script src="stock-pack.js"></script>
+  <script src="docs.js"></script>
   <script src="samples.js"></script>
   <script src="app.js"></script>
 </body>
