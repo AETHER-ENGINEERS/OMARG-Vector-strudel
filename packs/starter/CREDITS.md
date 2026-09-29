@@ -51,12 +51,21 @@ Freesound and were trimmed for Sonic Pi.
 
 ## What we changed
 
-- Downloaded the official `.flac` from `github.com/sonic-pi-net/sonic-pi` branch `dev`, path `etc/samples/`.
-- Re-encoded to Ogg Vorbis (`ffmpeg -c:a libvorbis -q:a 4`). No other processing.
-- Renamed into Tidal-style folders. `bd:0` is `drum_heavy_kick`, `bd:5` is `bd_808`.
+- Downloaded the official `.flac` from
+  `github.com/sonic-pi-net/sonic-pi` branch `dev`, path `etc/samples/`.
+- Re-encoded to mono 22050 Hz Ogg Vorbis (`ffmpeg -ac 1 -ar 22050 -c:a libvorbis -q:a 1`)
+  to keep the `.xdc` small. No other processing.
+- Renamed into Tidal-style folders. Playback names: `s("bd")`, `s("sd")`,
+  `s("hh")`, `s("oh")`, `s("cp")`, `s("rim")`, `s("ht")`, `s("mt")`,
+  `s("lt")`, `s("cr")`, `s("cb")`. Bank indexes follow file order
+  (`bd:0` is `drum_heavy_kick`, `bd:5` is `bd_808`).
 
 ## What we did not bundle
 
-- The rest of Sonic Pi’s library.
-- `tidalcycles/Dirt-Samples` (provenance unclear; see tidalcycles/Dirt-Samples#19).
-- Anything “free for non-commercial use only.”
+- The rest of Sonic Pi’s library (ambiences, loops, Arovane hits).
+- `tidalcycles/Dirt-Samples` — provenance of many folders is unclear
+  (see tidalcycles/Dirt-Samples#19). Do not vendor it here.
+- Anything that is “free for non-commercial use only.”
+
+User-imported packs sit in IndexedDB on that device and are *not* covered
+by this file. Keep those licenses with the pack you downloaded.
