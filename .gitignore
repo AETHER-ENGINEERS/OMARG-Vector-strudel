@@ -4,3 +4,5 @@ dist/
 *.log
 .idea/
 .vscode/
+strudel.xdc
+src/vendor/strudel-web.js
