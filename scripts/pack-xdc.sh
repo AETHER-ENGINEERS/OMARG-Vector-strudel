@@ -13,9 +13,11 @@ TMP="$(mktemp -d)"
 trap 'rm -rf "$TMP"' EXIT
 
 cp "$SRC/index.html" "$SRC/style.css" "$SRC/app.js" "$SRC/samples.js" "$SRC/manifest.toml" "$TMP/"
+if [[ -f "$SRC/docs.js" ]]; then cp "$SRC/docs.js" "$TMP/"; fi
 for part in "$SRC"/starter-pack-*.js; do
   [[ -f "$part" ]] && cp "$part" "$TMP/"
 done
+if [[ -f "$SRC/stock-pack.js" ]]; then cp "$SRC/stock-pack.js" "$TMP/"; fi
 if [[ -d "$SRC/vendor" ]]; then
   mkdir -p "$TMP/vendor"
   cp -R "$SRC/vendor/." "$TMP/vendor/"
@@ -25,6 +27,10 @@ if [[ -f "$SRC/icon.svg" ]]; then cp "$SRC/icon.svg" "$TMP/"; fi
 if [[ -f "$ROOT/packs/starter/CREDITS.md" ]]; then
   mkdir -p "$TMP/packs/starter"
   cp "$ROOT/packs/starter/CREDITS.md" "$TMP/packs/starter/"
+fi
+if [[ -d "$ROOT/packs/stock" ]]; then
+  mkdir -p "$TMP/packs/stock"
+  cp -R "$ROOT/packs/stock/." "$TMP/packs/stock/"
 fi
 (
   cd "$TMP"

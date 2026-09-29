@@ -1,7 +1,10 @@
-# v0.1.7
+# v0.1.11
 
-Good jam build. `main` stays Phase 0.
+Tested jam build on top of 0.1.7 plus in-app Help.
 
-`v0.1.8` was an accidental freeze — slider issues started there. 0.1.9 and 0.1.10 were scrapped.
+- Help drawer: Jam / Glossary / Sounds / Examples
+- Example Load buttons write the editor
+- Prefer sawtooth / piano / drums in Vector (no AudioWorklet)
 
-Packed drop-in is not in git. Build with `scripts/pack-xdc.sh`.
+`v0.1.7` remains the last freeze before this handbook.
+`main` stays Phase 0. Packed `.xdc` is not in git.
