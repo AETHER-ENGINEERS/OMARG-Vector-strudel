@@ -18,19 +18,47 @@
     <div class="who" id="who"></div>
   </header>
 
-  <textarea id="code" spellcheck="false" autocomplete="off" autocorrect="off">setcpm(132/4)
+  <div class="editor-wrap">
+    <pre id="codehi" class="code-hi" aria-hidden="true"></pre>
+    <textarea id="code" spellcheck="false" autocomplete="off" autocorrect="off">setcpm(140/4)
 
-// Starter kit already loaded: bd sd hh oh cp rim ht mt lt cr cb
-// Extra kits: Import pack. Ctrl/Cmd+Enter evals.
+// A minor. Every pitch is in the scale — swap a/c/e/g and it still sings.
+// Sliders: kick, hats, growl, lead, keys.
+// Tap Play once. Ctrl/Cmd+Enter sends to the room. Ctrl/Cmd+. stops.
 
-$: s("bd sd bd sd, hh*8")
-$: note("<c# f d# [d# a#2]>2").s("supersaw").sub(12)</textarea>
+$: s("bd*4").gain(slider(0.9, 0, 1))
+$: s("~ sd ~ sd").gain(0.52)
+$: s("hh*16").gain(slider(0.2, 0, 1))
+$: s("~ ~ oh ~").gain(0.28)
+
+$: note("[a1 a1] [a1 c2] [a1 a1] [g1 a1]")
+  .s("sawtooth")
+  .lpf(slider(340, 80, 2000))
+  .lpq(6)
+  .gain(0.48)
+
+$: note("<a3 c4 e4 g4 a4 g4 e4 c4>/2")
+  .s("supersaw")
+  .lpf(slider(1600, 400, 4800))
+  .room(0.35)
+  .gain(0.26)
+
+$: note("<a3 ~ e4 c4 ~ g4 e4 a4>")
+  .s("piano")
+  .room(0.5)
+  .gain(slider(0.4, 0, 1))</textarea>
+  </div>
+
+  <div id="sliders" class="sliders" hidden></div>
+  <p id="err" class="err" hidden></p>
 
   <div class="bar">
     <button id="play">Play</button>
     <button id="stop" disabled>Stop</button>
     <button id="eval">Eval to room</button>
-    <button id="import" class="ghost">Import pack</button>
+    <label class="live"><input id="live" type="checkbox" checked /> live</label>
+    <label class="filebtn ghost">Import pack<input id="importfile" type="file" multiple accept="audio/*,.wav,.mp3,.ogg,.oga,.opus,.flac,.m4a,.zip" /></label>
+    <button id="importchat" class="ghost" hidden>From chat</button>
     <button id="clearbank" class="ghost">Clear bank</button>
     <label class="cps">cpm <input id="cpm" type="number" value="33" min="1" max="400" /></label>
   </div>
@@ -46,6 +74,7 @@ $: note("<c# f d# [d# a#2]>2").s("supersaw").sub(12)</textarea>
   <script src="starter-pack-2.js"></script>
   <script src="starter-pack-3.js"></script>
   <script src="starter-pack-4.js"></script>
+  <script src="stock-pack.js"></script>
   <script src="samples.js"></script>
   <script src="app.js"></script>
 </body>
