@@ -1,0 +1,55 @@
+:root {
+  --bg: #0b0c10;
+  --fg: #e8e6e3;
+  --muted: #8b9088;
+  --accent: #c8f542;
+  --danger: #ff5c5c;
+  --panel: #15171c;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; background: var(--bg); color: var(--fg);
+  font: 14px/1.4 ui-monospace, "Cascadia Code", "Fira Code", Menlo, monospace; }
+header {
+  display: flex; gap: 12px; align-items: center;
+  padding: 12px 14px; border-bottom: 1px solid #222;
+}
+.mark { font-size: 28px; color: var(--accent); }
+h1 { font-size: 16px; margin: 0; font-weight: 600; }
+header p { margin: 0; color: var(--muted); font-size: 12px; }
+.who { margin-left: auto; color: var(--muted); font-size: 12px; }
+#code {
+  width: 100%; height: 48vh; resize: vertical;
+  background: var(--panel); color: var(--fg);
+  border: 0; padding: 14px; outline: none;
+}
+.bar {
+  display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+  padding: 10px 14px; border-top: 1px solid #222;
+}
+button {
+  background: var(--accent); color: #111; border: 0;
+  padding: 8px 14px; font: inherit; font-weight: 600; border-radius: 6px;
+}
+button:disabled { opacity: .4; }
+#stop { background: var(--danger); color: #fff; }
+button.ghost {
+  background: transparent; color: var(--fg);
+  border: 1px solid #333;
+}
+.bank { padding: 10px 14px; border-top: 1px solid #222; }
+.bank h2 { margin: 0 0 4px; font-size: 12px; color: var(--muted); font-weight: 600; }
+.bank p { margin: 0 0 8px; color: var(--muted); font-size: 12px; }
+.bank ul { margin: 0; padding: 0; list-style: none; display: flex; flex-wrap: wrap; gap: 6px; }
+.bank li {
+  background: var(--panel); border: 1px solid #2a2a2a;
+  padding: 4px 8px; border-radius: 4px; font-size: 12px;
+}
+.cps { color: var(--muted); }
+.cps input {
+  width: 64px; background: var(--panel); color: var(--fg);
+  border: 1px solid #333; padding: 6px; font: inherit;
+}
+#log {
+  margin: 0; padding: 10px 14px; color: var(--muted);
+  font-size: 11px; white-space: pre-wrap; max-height: 22vh; overflow: auto;
+}

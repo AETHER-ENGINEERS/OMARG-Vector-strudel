@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Strudel XDC</title>
+  <script src="webxdc.js"></script>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header>
+    <div class="mark">∿</div>
+    <div>
+      <h1>Strudel XDC</h1>
+      <p id="status">solo · tap play to arm audio</p>
+    </div>
+    <div class="who" id="who"></div>
+  </header>
+
+  <textarea id="code" spellcheck="false" autocomplete="off" autocorrect="off">setcpm(132/4)
+
+// Samples are local. Download dirt-samples (or any kit) from GitHub
+// as a zip, then Import pack. Names come from folder/file:
+//   bd/BT0AADA.wav  ->  s("bd")
+// Synths need no pack.
+
+$: s("bd sd bd sd, hh*8")
+$: note("<c# f d# [d# a#2]>2").s("supersaw").sub(12)</textarea>
+
+  <div class="bar">
+    <button id="play">Play</button>
+    <button id="stop" disabled>Stop</button>
+    <button id="eval">Eval to room</button>
+    <button id="import" class="ghost">Import pack</button>
+    <button id="clearbank" class="ghost">Clear bank</button>
+    <label class="cps">cpm <input id="cpm" type="number" value="33" min="1" max="400" /></label>
+  </div>
+
+  <section id="bank" class="bank">
+    <h2>Local bank</h2>
+    <p id="bankmeta">empty — import wav/mp3/ogg or a GitHub zip</p>
+    <ul id="banklist"></ul>
+  </section>
+
+  <pre id="log"></pre>
+  <script src="samples.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
