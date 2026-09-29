@@ -140,7 +140,6 @@ async function ingestFile(file, prefix) {
 }
 
 async function restoreFromIdb() {
-  // Do not clear the bank — loadStarter() runs first and must survive this.
   const rows = await idbGetAll().catch(() => []);
   for (const row of rows) {
     if (typeof row.key === "string" && row.blob) addToBank(row.key, row.blob);
@@ -250,6 +249,30 @@ function loadStarter() {
   return n;
 }
 
+const urlCache = new Map();
+
+function revokeUrls() {
+  for (const url of urlCache.values()) {
+    try { URL.revokeObjectURL(url); } catch (_) {}
+  }
+  urlCache.clear();
+}
+
+function urlFor(path, blob) {
+  if (urlCache.has(path)) return urlCache.get(path);
+  const url = URL.createObjectURL(blob);
+  urlCache.set(path, url);
+  return url;
+}
+
+function strudelMap() {
+  const map = {};
+  for (const [name, entry] of bank.sounds) {
+    map[name] = entry.files.map((f) => urlFor(f.name, f.blob));
+  }
+  return map;
+}
+
 window.StrudelSamples = {
   bank,
   restoreFromIdb,
@@ -260,9 +283,11 @@ window.StrudelSamples = {
   snippet,
   playSample,
   decodeSound,
+  strudelMap,
   clear: async () => {
     bank.sounds.clear();
     bank.decoded.clear();
+    revokeUrls();
     await idbClear();
     loadStarter();
   },
