@@ -17,6 +17,36 @@ header {
 h1 { font-size: 16px; margin: 0; font-weight: 600; }
 header p { margin: 0; color: var(--muted); font-size: 12px; }
 .who { margin-left: auto; color: var(--muted); font-size: 12px; }
+.helpbtn { margin-left: 8px; padding: 6px 10px; font-size: 12px; }
+.help {
+  padding: 10px 14px 16px;
+  border-bottom: 1px solid #222;
+  background: #101218;
+  max-height: 42vh;
+  overflow: auto;
+}
+.help-tabs { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 10px; }
+.help-tabs button {
+  background: transparent; color: var(--fg);
+  border: 1px solid #333; padding: 5px 10px; font-size: 12px;
+}
+.help-tabs button.on { border-color: var(--accent); color: var(--accent); }
+.help h3 { margin: 0 0 8px; font-size: 13px; }
+.help ol { margin: 0 0 10px; padding-left: 18px; }
+.help p, .help li, .help dd { color: var(--fg); font-size: 13px; }
+.help .muted { color: var(--muted); font-size: 12px; }
+.help dl { margin: 0; }
+.help dt { color: var(--accent); margin-top: 8px; }
+.help dd { margin: 2px 0 0 0; color: var(--muted); }
+.help code { color: var(--accent); }
+.exlist { display: flex; flex-direction: column; gap: 8px; }
+.ex {
+  border: 1px solid #2a2a2a; background: var(--panel);
+  padding: 8px 10px; border-radius: 6px;
+}
+.ex h4 { margin: 0 0 4px; font-size: 13px; }
+.ex p { margin: 0 0 8px; color: var(--muted); font-size: 12px; }
+.ex button { padding: 6px 10px; font-size: 12px; }
 .editor-wrap {
   position: relative;
   height: 48vh;
