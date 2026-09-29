@@ -6,7 +6,7 @@ AETHER-ENGINEERS / OMARG port. Drop the built `.xdc` into a Vector chat. Peers t
 
 **Status:** Phase 0 scaffold plus a bundled CC0 starter drum kit. Not a full `@strudel/*` REPL yet.
 
-**License:** AGPL-3.0-or-later for *code*. Bundled starter *audio* is CC0 1.0 from Sonic Pi — see the addendum at the bottom of `LICENSE` and the full map in `packs/starter/CREDITS.md`. The AGPL text was not replaced.
+**License:** AGPL-3.0-or-later for *code*. Bundled starter *audio* is CC0 1.0 from Sonic Pi — see the addendum at the bottom of `LICENSE` and the full map in `packs/starter/CREDITS.md`. The AGPL text was not replaced. The CC0 hits do not become AGPL.
 
 Repo: https://github.com/AETHER-ENGINEERS/OMARG-Vector-strudel
 
@@ -14,21 +14,17 @@ Repo: https://github.com/AETHER-ENGINEERS/OMARG-Vector-strudel
 
 ## Starter kit
 
-24 one-shots ship inside `src/starter-pack-1.js` … `starter-pack-4.js` (~230 KB audio, Ogg Vorbis).
+24 one-shots, Tidal names: `bd` `sd` `hh` `oh` `cp` `rim` `ht` `mt` `lt` `cr` `cb`.
 
-Names: `bd` `sd` `hh` `oh` `cp` `rim` `ht` `mt` `lt` `cr` `cb`
+Source: [Sonic Pi `etc/samples`](https://github.com/sonic-pi-net/sonic-pi/tree/dev/etc/samples), CC0 1.0. Dirt-Samples was not used (unclear provenance).
 
-Source: [Sonic Pi `etc/samples`](https://github.com/sonic-pi-net/sonic-pi/tree/dev/etc/samples), CC0. Dirt-Samples was not used (unclear provenance).
+Play works with no import once the kit is built in. Extra kits still come through **Import pack** (`webxdc.importFiles`) and live in IndexedDB on that device.
 
-Play works with no import. Extra kits still come through **Import pack** (`webxdc.importFiles`) and live in IndexedDB on that device.
-
----
-
-## Build the `.xdc`
+Generate / refresh the inlined kit (needs `curl`, `ffmpeg`, `python3`):
 
 ```sh
-bash scripts/pack-xdc.sh
-# writes ./strudel.xdc — attach in Vector
+bash scripts/rebuild-starter.sh   # downloads Sonic Pi flacs, writes ogg + src/starter-pack-*.js
+bash scripts/pack-xdc.sh          # writes ./strudel.xdc — attach in Vector
 ```
 
 Do not zip `webxdc.js`. The host injects it.
