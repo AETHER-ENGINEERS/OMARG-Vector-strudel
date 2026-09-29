@@ -1,7 +1,3 @@
-The below applies, as well as our license:
-
-https://github.com/AETHER-ENGINEERS/AETHER-ENGINEERS/blob/main/LICENSE (or most current version)
-
 GNU AFFERO GENERAL PUBLIC LICENSE
 Version 3, 19 November 2007
 
@@ -23,3 +19,28 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 Strudel / @strudel/* (uzu/strudel, Codeberg) is licensed under AGPL-3.0
 and forces this distribution to remain AGPL-3.0-or-later. The full
 AGPL-3.0 text is at https://www.gnu.org/licenses/agpl-3.0.html
+
+------------------------------------------------------------------------
+ADDITIONAL TERMS — bundled starter audio (does not replace the AGPL above)
+------------------------------------------------------------------------
+
+The code and documentation in this repository remain AGPL-3.0-or-later.
+
+A small starter drum kit is shipped under packs/starter/ (and inlined in
+src/starter-pack-*.js). That audio is NOT an AETHER-ENGINEERS original.
+It is a recompressed subset of the Sonic Pi etc/samples library, which
+Sonic Pi dedicates to the public domain under CC0 1.0 Universal:
+
+    https://creativecommons.org/publicdomain/zero/1.0/
+    https://github.com/sonic-pi-net/sonic-pi/blob/dev/etc/samples/README.md
+
+CC0 audio may be copied, modified, and redistributed without permission.
+Attribution is not required by CC0; we still record the full source map
+in packs/starter/CREDITS.md so credits stay attached to the files.
+
+The AGPL on this project's source code does not re-license those CC0
+hits as AGPL, and the CC0 hits do not weaken the AGPL on the source.
+Each work keeps its own terms.
+
+If you replace or add samples, document them in packs/starter/CREDITS.md
+(or a new packs/<name>/CREDITS.md) rather than deleting this section.

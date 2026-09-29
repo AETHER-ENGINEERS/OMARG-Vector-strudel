@@ -19,10 +19,8 @@
 
   <textarea id="code" spellcheck="false" autocomplete="off" autocorrect="off">setcpm(132/4)
 
-// Samples are local. Download dirt-samples (or any kit) from GitHub
-// as a zip, then Import pack. Names come from folder/file:
-//   bd/BT0AADA.wav  ->  s("bd")
-// Synths need no pack.
+// Starter kit (Sonic Pi CC0) is already loaded: bd sd hh oh cp rim ht mt lt cr cb
+// Import pack still works for extra kits.
 
 $: s("bd sd bd sd, hh*8")
 $: note("<c# f d# [d# a#2]>2").s("supersaw").sub(12)</textarea>
@@ -38,11 +36,15 @@ $: note("<c# f d# [d# a#2]>2").s("supersaw").sub(12)</textarea>
 
   <section id="bank" class="bank">
     <h2>Local bank</h2>
-    <p id="bankmeta">empty — import wav/mp3/ogg or a GitHub zip</p>
+    <p id="bankmeta">loading starter kit…</p>
     <ul id="banklist"></ul>
   </section>
 
   <pre id="log"></pre>
+  <script src="starter-pack-1.js"></script>
+  <script src="starter-pack-2.js"></script>
+  <script src="starter-pack-3.js"></script>
+  <script src="starter-pack-4.js"></script>
   <script src="samples.js"></script>
   <script src="app.js"></script>
 </body>
